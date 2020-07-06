@@ -8,7 +8,7 @@ const Task = mongoose.model('Task',{
         trim: true,
         validate(name) {
             //custom validator if any. Useful for blacklisting 
-            console.log(name)
+            //console.log(name)
         }
     },
     completed: {
@@ -17,6 +17,15 @@ const Task = mongoose.model('Task',{
     }
 })
 
-module.exports = Task
+/**
+ * Round about way to delete. Given a name, find id and delete
+ * @param {*} name 
+ */
+const findTaskAndUpdateCompleted = async (name) => {
+    task = await Task.findOne( {name:name})
+    return await Task.findByIdAndDelete(task._id)
+}
+
+module.exports = {Task, findTaskAndUpdateCompleted}
 
 

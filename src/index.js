@@ -1,38 +1,43 @@
 const express = require('express')
-const Task = require('./models/task')
+const {Task,findTaskAndUpdateCompleted} = require('./models/task')
 const mongoose = require('./db/mangoose')
 
 const app = express()
-const port = process.env.port || 3000
+const port = process.env.PORT || 3000
 
 //consvert body to json from application/json
 app.use(express.json())
 
-app.get('/tasks', (req, res) => {
-    Task.find({}).then((tasks)=> {
-        res.status(200).send(tasks)
-    }).catch((error)=>{
-        res.status(500).send(error)
-    })
+app.get('/tasks', async (req, res) => {
+    try {
+        res.send(await Task.find({}))
+    }catch(e) {
+        res.status(500).send(e)
+    }
 })
 
-app.get('/tasks/:name',(req, res) => {
-    Task.find({name:req.params.name}).then((task)=>{
-        res.status(200).send(task)
-    }).catch((error)=> {
-        res.status(404).send(error)
-    })
+app.get('/tasks/:name', async (req, res) => {
+    try{
+        res.send(await Task.find({name:req.params.name}))
+    }catch(e) {
+        res.status(500).send(e)
+    }
 })
 
-app.post('/tasks', (req, res)=> {
-    console.log(req.body)
-    const task = new Task(req.body)
-    task.save().then((task)=>{
-        res.status(201).send(task)
-    })
-    .catch((error)=>{
-        res.status(400).send(error)
-    }) 
+app.post('/tasks', async (req, res)=> {
+    try{
+        res.status(201).send(await new Task(req.body).save())
+    }catch(e){
+        res.status(400).send(e)
+    }
+})
+
+app.delete('/tasks/:name', async (req, res) => {
+    try {
+        res.send(await findTaskAndUpdateCompleted(req.params.name))
+    }catch(e) {
+        res.status(404).send(e)
+    }
 })
 
 app.listen(port, ()=> {
