@@ -40,6 +40,23 @@ app.delete('/tasks/:name', async (req, res) => {
     }
 })
 
+app.patch('/tasks/:id', async (req, res) => {
+    const updates = Object.keys(req.body)
+    const allowedUpdates = ['name','completed']
+    
+    const isAllowedUpdate = updates.every((update)=> allowedUpdates.includes(update))
+
+    if(!isAllowedUpdate) {
+        return res.status(400).send('Not a valid update!')
+    }
+    try {
+        res.send(await Task.findByIdAndUpdate(req.params.id,req.body, {new:true}))
+    }catch(e) {
+        res.status(500).send(e)
+    }
+
+})
+
 app.listen(port, ()=> {
     console.log('Task service listening on',port)
 })
