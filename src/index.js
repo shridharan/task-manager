@@ -9,13 +9,19 @@ const port = process.env.port || 3000
 app.use(express.json())
 
 app.get('/tasks', (req, res) => {
-    // const task = new Task(req.body)
-    // task.save().then((task)=>{
-    //     res.status(201).send($task)
-    // })
-    // .catch((error)=>{
-    //     res.status(400).send(error)
-    // }) 
+    Task.find({}).then((tasks)=> {
+        res.status(200).send(tasks)
+    }).catch((error)=>{
+        res.status(500).send(error)
+    })
+})
+
+app.get('/tasks/:name',(req, res) => {
+    Task.find({name:req.params.name}).then((task)=>{
+        res.status(200).send(task)
+    }).catch((error)=> {
+        res.status(404).send(error)
+    })
 })
 
 app.post('/tasks', (req, res)=> {
