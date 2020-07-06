@@ -1,5 +1,5 @@
 const express = require('express')
-const Task = require('./utils/task')
+const Task = require('./models/task')
 const mongoose = require('./db/mangoose')
 
 const app = express()
