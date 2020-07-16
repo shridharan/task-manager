@@ -5,9 +5,40 @@ const auth = require('../middleware/auth')
 const {Task,findTaskAndUpdateCompleted} = require('../models/task')
 
 //only get the tasks for which user is the owner
+// Get tasks?completed=true
+// Get tasks?limit=1&skip=1
+// Get tasks?sortBy=createdAt:desc
 taskRouter.get('/tasks', auth, async (req, res) => {
+    const match = {}
+    if(req.query.completed) {
+        match.completed = req.query.completed === 'true'
+    }
+    let limit = 10
+    if(req.query.limit) {
+        limit = parseInt(req.query.limit)
+    }
+
+    let skip = 0
+    if(req.query.skip) {
+        skip = parseInt(req.query.skip)
+    }
+
+    const sortBy = {}
+    if(req.query.sortBy) {
+        const parts = req.query.sortBy.split(':')
+        sortBy[parts[0]] =  parts[1] === 'asc' ? 1 : -1
+    }
+
     try {
-        await req.user.populate('tasks').execPopulate()
+        await req.user.populate({
+            path:'tasks',
+            match,
+            options: { 
+                limit: limit,
+                skip: skip,
+                sort: sortBy
+            }
+        }).execPopulate()
         res.send(req.user.tasks)
         //res.send(await Task.find({owner:req.user._id}))
     }catch(e) {

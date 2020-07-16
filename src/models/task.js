@@ -1,7 +1,6 @@
 const mongoose = require('mongoose')
 const validator = require ('validator')
-
-const Task = mongoose.model('Task',{
+const taskSchema = mongoose.Schema({
     name: {
         required: true,
         type: String,
@@ -20,7 +19,11 @@ const Task = mongoose.model('Task',{
         required: true,
         ref: 'User'
     }
+},{
+    timestamps: true
 })
+
+const Task = mongoose.model('Task', taskSchema)
 
 /**
  * Round about way to delete. Given a name, find id and delete
