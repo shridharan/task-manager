@@ -2,6 +2,9 @@ const express = require('express')
 const userRouter = express.Router()
 const User = require('../models/user')
 const auth = require('../middleware/auth')
+const multer = require('multer')
+const path = require('path')
+
 //Create new user
 userRouter.post('/users/signup', async (req, res) => {
     try {
@@ -83,6 +86,42 @@ userRouter.delete('/users/me', auth, async (req, res) => {
         res.status(404).send(e)
     }
 })
+
+const upload = multer({
+    limits: {
+        fileSize: 1000000
+    },
+    fileFilter(req,file,cb) {
+
+        if(!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+            return cb(new Error('Not a valid image! Supported types are jpg,jpeg and png'))
+        }
+        cb(undefined, Date.now()+path.extname(file.originalname))
+        //cb(undefined, true)
+    }
+})
+
+userRouter.post('/users/me/avatar', auth, upload.single('avatar'), async (req, res) => {
+    req.user.avatar = req.file.buffer
+    await req.user.save()
+    res.send()
+}, (error, req, res, next) => {
+    console.log(error)
+    //function to catch unhandled errors
+    res.status(400).send({error: error.message})
+ })
+
+ userRouter.delete('/users/me/avatar',auth, async (req,res)=> {
+     try{
+        if(!req.user.avatar) 
+            return res.status(404).send({error:'Avatar not found!'})
+        req.user.avatar = undefined
+        await req.user.save()
+        res.send()
+     } catch (e) {
+         res.status(500).send(e.message)
+     }
+ })
 
 
 module.exports = userRouter
