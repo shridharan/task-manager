@@ -2,7 +2,6 @@ const mongoose = require('mongoose')
 const validator = require('validator')
 const bcrypt = require('bcryptjs')
 const jwt  = require('jsonwebtoken')
-const {appSecret} = require('../config/config')
 const {Task} = require('../models/task')
 
 const userSchema = new mongoose.Schema({
@@ -66,7 +65,7 @@ userSchema.methods.toJSON = function() {
 userSchema.methods.generateAuthToken = async function () {
     const user = this
     //this should eventually come from configs and not hard coded
-    const token = jwt.sign({_id:this._id.toString()},appSecret)
+    const token = jwt.sign({_id:this._id.toString()},process.env.JWT_SECRET)
     this.tokens =  this.tokens.concat({token})
     await this.save()
     return token

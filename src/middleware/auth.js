@@ -1,11 +1,10 @@
 const jwt = require('jsonwebtoken')
-const {appSecret} = require('../config/config')
 const User = require('../models/user')
 
 const auth = async (req, res, next) => {
     try{
         const token = req.header('Authorization').replace('Bearer ','')
-        const decodedJwt = jwt.verify(token, appSecret)
+        const decodedJwt = jwt.verify(token, process.env.JWT_SECRET)
         req.user = await User.findOne({_id:decodedJwt._id,'tokens.token': token})
         if (!req.user) {
             throw new Error('Unable to find user!')

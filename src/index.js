@@ -9,7 +9,7 @@ app.use(express.json())
 app.use(taskRouter)
 app.use(userRouter)
 
-const port = process.env.PORT || 3000
+const port = process.env.PORT
 app.listen(port, ()=> {
     console.log('Task service listening on',port)
 })

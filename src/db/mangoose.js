@@ -1,7 +1,6 @@
-const mongoose = require('mongoose');
-const {mongoDBUrl} = require('../config/config')
+const mongoose = require('mongoose')
 
-mongoose.connect(mongoDBUrl, {
+mongoose.connect(process.env.MONGO_DB_URL, {
     useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true,

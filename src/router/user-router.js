@@ -5,11 +5,14 @@ const auth = require('../middleware/auth')
 const multer = require('multer')
 const path = require('path')
 const sharp = require('sharp')
+const {sendWelcomeEmail,sendCancellationEmail} = require('../email/account')
 
 //Create new user
 userRouter.post('/users/signup', async (req, res) => {
     try {
         const user = await new User(req.body).save()
+        //even though this is async, we don't need to synchornously send an email
+        sendWelcomeEmail(user.email, user.name)
         const token = await user.generateAuthToken()
         res.status(201).send({user,token})
     } catch (e) {
@@ -82,6 +85,7 @@ userRouter.patch('/users/me', auth, async (req, res) => {
 
 userRouter.delete('/users/me', auth, async (req, res) => {
     try {
+        sendCancellationEmail(req.user.email, req.user.name)
         res.send(await req.user.remove())
     } catch (e) {
         res.status(404).send(e)
